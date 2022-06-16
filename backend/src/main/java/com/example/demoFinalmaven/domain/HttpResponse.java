@@ -49,5 +49,5 @@ public class HttpResponse {
         this.message = message;
     }
 
-    
+
 }
