@@ -6,23 +6,30 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.example.demoFinalmaven.constant.SecurityConstant;
 import com.example.demoFinalmaven.domain.UserPrincipal;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 import static com.example.demoFinalmaven.constant.SecurityConstant.*;
-import static java.util.stream.StreamSupport.stream;
+import static java.util.Arrays.*;
 
+@Component
 public class JWTTokenProvider {
+
     @Value("${jwt.secret}")
-    private String secret;
+    private String secret; //Comming from our .yml file
 
     //This method is responsible to Generate the Token after the user has been authenticated.
     public String generateJwtToken(UserPrincipal userPrincipal){
@@ -37,6 +44,27 @@ public class JWTTokenProvider {
     public List<GrantedAuthority> getAuthorities(String token){
         String[] claims = getClaimsFromToken(token);
         return stream(claims).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    }
+
+    public Authentication getAuthentication(String unsername, List<GrantedAuthority> authorities, HttpServletRequest request){
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(unsername, null, authorities);
+        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        return usernamePasswordAuthenticationToken;
+    }
+
+    public boolean isTokenValid(String username, String token){
+        JWTVerifier verifier = getJWTVerifier();
+        return StringUtils.isNotEmpty(username) && !isTokenExpired(verifier, token);
+;    }
+
+    public boolean isTokenExpired(JWTVerifier verifier, String token){
+        Date expiration = verifier.verify(token).getExpiresAt();
+        return expiration.before(new Date());
+    }
+
+    public String getSubJect(String token){
+        JWTVerifier verifier = getJWTVerifier();
+        return verifier.verify(token).getSubject();
     }
 
     private String[] getClaimsFromToken(String token) {
