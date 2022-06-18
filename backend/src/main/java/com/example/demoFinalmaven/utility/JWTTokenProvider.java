@@ -79,7 +79,7 @@ public class JWTTokenProvider {
             Algorithm algorithm = HMAC512(secret);
             verifier = JWT.require(algorithm).withIssuer(LOIC_SANOU_LLC).build();
         }catch(JWTVerificationException exception){
-            throw new JWTVerificationException(ACCES_DENIED_MESSAGE);
+            throw new JWTVerificationException(ACCESS_DENIED_MESSAGE);
         }
         return verifier;
     }
