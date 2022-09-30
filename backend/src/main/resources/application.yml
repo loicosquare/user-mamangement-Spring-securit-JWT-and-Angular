@@ -10,7 +10,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/supportportal #change this to your database url
+    url: jdbc:mysql://localhost:3306/supportportal?serverTimezone=UTC #change this to your database url
     password:  #change this to your database username
     username: root #change this to your database password
   jpa:
