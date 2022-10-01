@@ -53,8 +53,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().cors().and()
                 .sessionManagement().sessionCreationPolicy(STATELESS)
-                .and().authorizeRequests().antMatchers(PUBLIC_URLS).permitAll()
-                .anyRequest().authenticated()
+                .and().authorizeRequests().antMatchers(PUBLIC_URLS).permitAll()//to permit access only to the routes on security constant file.
+                .anyRequest().authenticated()// and the other routes the user must be authenticated.
                 .and()
                 .exceptionHandling().accessDeniedHandler(jwtAccessDeniedHandler)
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
